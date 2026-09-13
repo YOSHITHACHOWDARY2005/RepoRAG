@@ -1,7 +1,19 @@
 from app.services.generation_service import generate_answer
 
 
-def test_generate_answer():
+class MockResponse:
+    text = "The function used to calculate the sum is calculate_sum."
+
+
+def test_generate_answer(monkeypatch):
+    def mock_generate_content(*args, **kwargs):
+        return MockResponse()
+
+    monkeypatch.setattr(
+        "app.services.generation_service.client.models.generate_content",
+        mock_generate_content,
+    )
+
     prompt = """
 You are RepoRAG.
 
@@ -22,5 +34,4 @@ def calculate_sum(a, b):
     answer = generate_answer(prompt)
 
     assert answer
-    assert isinstance(answer, str)
-    assert len(answer.strip()) > 0
+    assert "calculate_sum" in answer
