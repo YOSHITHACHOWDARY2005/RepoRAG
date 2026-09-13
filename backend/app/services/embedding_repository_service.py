@@ -26,16 +26,25 @@ def embed_chunk(db: Session, chunk_id) -> CodeChunk:
     db.refresh(chunk)
 
     return chunk
-def embed_all_chunks(db: Session, batch_size: int = 10) -> int:
+def embed_all_chunks(
+    db: Session,
+    repository_id=None,
+    batch_size: int = 10,
+) -> int:
     total_embedded = 0
 
     while True:
-        chunks = (
+        query = (
             db.query(CodeChunk)
             .filter(CodeChunk.embedding.is_(None))
-            .limit(batch_size)
-            .all()
         )
+
+        if repository_id is not None:
+            query = query.filter(
+                CodeChunk.repository_id == repository_id
+            )
+        
+        chunks = query.limit(batch_size).all()
 
         if not chunks:
             break

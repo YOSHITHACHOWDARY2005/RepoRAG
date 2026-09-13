@@ -1,4 +1,5 @@
 from app.database import SessionLocal
+from app.models import Repository
 from app.services.repository_service import ingest_repository
 
 
@@ -6,6 +7,17 @@ def test_ingest_repository():
     db = SessionLocal()
 
     try:
+        repository = (
+            db.query(Repository)
+            .filter(
+                Repository.repo_url
+                == "https://github.com/pallets/flask"
+            )
+            .first()
+        )
+
+        assert repository is not None
+
         repository = ingest_repository(
             db,
             "https://github.com/pallets/flask"

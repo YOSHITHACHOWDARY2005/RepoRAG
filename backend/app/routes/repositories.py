@@ -6,8 +6,7 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models import Repository
 from app.schemas import RepositoryCreateRequest, RepositoryResponse
-from app.services.repository_service import ingest_repository
-
+from app.services.repository_pipeline_service import process_repository
 
 router = APIRouter(
     prefix="/api/repositories",
@@ -24,7 +23,7 @@ def create_repository(
     db: Session = Depends(get_db),
 ):
     try:
-        repository = ingest_repository(
+        repository = process_repository(
             db=db,
             repo_url=request.repo_url,
         )
