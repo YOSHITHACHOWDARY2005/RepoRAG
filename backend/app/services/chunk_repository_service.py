@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-
+from sqlalchemy import delete
 from app.models import CodeChunk, Repository
 from app.services.chunking_service import chunk_text
 from app.services.file_filter_service import get_supported_files
@@ -16,6 +16,16 @@ def chunk_repository(
 
     if repository is None:
         raise ValueError("Repository not found")
+    
+    
+    db.execute(
+        delete(CodeChunk).where(
+            CodeChunk.repository_id == repository.id
+            )
+    )
+    db.flush()
+
+
 
     github_repo, repo_path, temp_directory = clone_repository(
         repository.repo_url

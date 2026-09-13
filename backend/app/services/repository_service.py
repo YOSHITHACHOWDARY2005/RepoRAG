@@ -43,9 +43,17 @@ def ingest_repository(
     repo_url: str
 ) -> Repository:
 
+    existing_repository = (
+        db.query(Repository)
+        .filter(Repository.repo_url == repo_url)
+        .first()
+    )
+
+    if existing_repository is not None:
+        return existing_repository
+
     github_repo = None
     temp_directory = None
-
     try:
         github_repo, repo_path, temp_directory = clone_repository(repo_url)
 
